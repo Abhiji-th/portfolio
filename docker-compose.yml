@@ -1,6 +1,22 @@
 services:
+  api:
+    build: ./backend
+    container_name: portfolio_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/portfolio_db
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - mongodb
+      - redis
+
   mongodb:
     image: mongo:latest
+    container_name: portfolio_db
     ports:
       - "27017:27010"
     volumes:
@@ -8,6 +24,7 @@ services:
 
   redis:
     image: redis:latest
+    container_name: portfolio_redis
     ports:
       - "6379:6379"
 
