@@ -4,6 +4,7 @@ import cors from "cors";
 import mongoose from "mongoose";
 import connectDB from "./config/db.js";
 import { connectRedis, redisClient } from "./config/redis.js";
+import projectRoutes from "./routes/projectRoutes.js";
 
 dotenv.config();
 
@@ -14,6 +15,8 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+app.use("/api/v1/projects", projectRoutes);
 
 app.get("/", (req, res) => {
   res.send("Portfolio API running");
