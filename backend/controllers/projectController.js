@@ -40,6 +40,8 @@ const createProject = async (req, res) => {
   try {
     const newProject = await Project.create(req.body);
 
+    await redisClient.del("portfolio_projects");
+
     res.status(201).json({
       success: true,
       data: newProject,

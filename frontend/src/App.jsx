@@ -1,9 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const fetchProjects = async () => {
   const response = await axios.get("http://localhost:8000/api/v1/projects");
+  return response.data;
+};
+
+const createProject = async (newProject) => {
+  const response = await axios.post(
+    "http://localhost:8000/api/v1/projects",
+    newProject,
+  );
   return response.data;
 };
 
@@ -14,10 +22,37 @@ const projects = [
 ];
 
 const App = () => {
+  const queryClient = useQueryClient();
+
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    techStack: "",
+  });
+
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["projects"],
     queryFn: fetchProjects,
   });
+
+  const mutation = useMutation({
+    mutationFn: createProject,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      setFormData({ title: "", description: "", techStack: "" });
+    },
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const projectPayload = {
+      ...formData,
+      techStack: formData.techStack.split(",").map((tech) => tech.trim()),
+    };
+
+    mutation.mutate(projectPayload);
+  };
 
   if (isLoading)
     return <div style={{ padding: "40px" }}>Loading your portfolio...</div>;
@@ -32,9 +67,68 @@ const App = () => {
     <div>
       <h1>Abhijith C | Portfolio</h1>
       <p>Visitor count: 0 (Coming soon with redis!)</p>
+
+      <div
+        style={{
+          background: "#000",
+          padding: "20px",
+          borderRadius: "8px",
+          marginBottom: "30px",
+        }}
+      >
+        <h2>➕ Add New Project</h2>
+        <form
+          onSubmit={handleSubmit}
+          style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+        >
+          <input
+            type="text"
+            placeholder="Project Title"
+            required
+            value={formData.title}
+            onChange={(e) =>
+              setFormData({ ...formData, title: e.target.value })
+            }
+            style={{ padding: "8px" }}
+          />
+          <textarea
+            placeholder="Description"
+            required
+            value={formData.description}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
+            style={{ padding: "8px", minHeight: "60px" }}
+          />
+          <input
+            type="text"
+            placeholder="Tech Stack (comma separated, e.g., React, Node, Redis)"
+            required
+            value={formData.techStack}
+            onChange={(e) =>
+              setFormData({ ...formData, techStack: e.target.value })
+            }
+            style={{ padding: "8px" }}
+          />
+          <button
+            type="submit"
+            disabled={mutation.isPending}
+            style={{
+              padding: "10px",
+              background: "#007bff",
+              color: "white",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            {mutation.isPending ? "Saving..." : "Save Project"}
+          </button>
+        </form>
+      </div>
+
       <hr />
 
-      <div style={{ background: "#eee", padding: "10px", borderRadius: "5px" }}>
+      <div style={{ background: "#555", padding: "10px", borderRadius: "5px" }}>
         <p>
           📡 <strong>Data Source:</strong> {data.source}
         </p>
