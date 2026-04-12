@@ -2,12 +2,10 @@ import React from "react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import axios from "axios";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const loginAPI = async (credentials) => {
-  const response = await axios.post(
-    "http://localhost:8000/api/v1/auth/login",
-    credentials,
-  );
+  const response = await axios.post(`${API_URL}/auth/login`, credentials);
   return response.data;
 };
 
@@ -20,11 +18,7 @@ const createProject = async (newProject) => {
     },
   };
 
-  const response = await axios.post(
-    "http://localhost:8000/api/v1/projects",
-    newProject,
-    config,
-  );
+  const response = await axios.post(`${API_URL}/projects`, newProject, config);
   return response.data;
 };
 

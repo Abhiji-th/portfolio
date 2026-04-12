@@ -14,6 +14,19 @@ services:
       - mongodb
       - redis
 
+  frontend:
+    build: ./frontend
+    container_name: portfolio_frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://backend:8000/api/v1
+    depends_on:
+      - backend
+
   mongodb:
     image: mongo:latest
     container_name: portfolio_db

@@ -3,12 +3,15 @@ import Project from "../models/Project.js";
 
 const getProjects = async (req, res) => {
   try {
+    const totalViews = await redisClient.incr("portfolio_views");
+
     const cachedProjects = await redisClient.get("portfolio_projects");
 
     if (cachedProjects) {
       return res.status(200).json({
         success: true,
         source: "Redis Cache",
+        totalViews,
         count: JSON.parse(cachedProjects).length,
         data: JSON.parse(cachedProjects),
       });
@@ -25,6 +28,7 @@ const getProjects = async (req, res) => {
     res.status(200).json({
       success: true,
       source: "MongoDB",
+      totalViews,
       count: projects.length,
       data: projects,
     });

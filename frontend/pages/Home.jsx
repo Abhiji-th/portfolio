@@ -1,9 +1,10 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const fetchProjects = async () => {
-  const response = await axios.get("http://localhost:8000/api/v1/projects");
+  const response = await axios.get(`${API_URL}/projects`);
   return response.data;
 };
 
@@ -25,7 +26,7 @@ const Home = () => {
   return (
     <div>
       <h1>Abhijith C | Portfolio</h1>
-      <p>Visitor count: 0 (Coming soon with redis!)</p>
+      <p>Visitor count: {data.totalViews}</p>
 
       <div style={{ background: "#555", padding: "10px", borderRadius: "5px" }}>
         <p>
