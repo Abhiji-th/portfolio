@@ -4,6 +4,8 @@ import User from "../models/User.js";
 const protect = async (req, res, next) => {
   let token;
 
+  console.log(req);
+
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer")
@@ -12,21 +14,21 @@ const protect = async (req, res, next) => {
   }
 
   if (!token)
-    res
+    return res
       .status(401)
       .json({ success: false, error: "Not authorized to access this route" });
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.user = User.findById(decoded.id);
+    req.user = await User.findById(decoded.id);
 
     if (!req.user)
-      res.status(401).json({ sucess: false, error: "User not found" });
+      return res.status(401).json({ success: false, error: "User not found" });
 
     next();
   } catch (error) {
-    res
+    return res
       .status(401)
       .json({ success: false, error: "Not authorized to access this route" });
   }
