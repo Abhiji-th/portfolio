@@ -31,12 +31,12 @@ const login = async (req, res) => {
         error: "Please provide an email and a password",
       });
 
-    const user = User.findOne({ email }).select("+password");
+    const user = await User.findOne({ email }).select("+password");
 
     if (!user)
       res.status(401).json({ success: false, error: "Invalid credentials" });
 
-    const isMatch = user.matchPassword(password);
+    const isMatch = await user.matchPassword(password);
 
     if (!isMatch)
       res.status(401).json({ success: false, error: "Invalid credentials" });
