@@ -1,18 +1,18 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-const API_URL = import.meta.env.VITE_API_URL;
-
-const fetchProjects = async () => {
-  const response = await axios.get(`${API_URL}/projects`);
-  return response.data;
-};
+import ProjectList from "../components/ProjectList";
+import { useDeleteMutation, useProjects } from "../hooks/useProjects";
 
 const Home = () => {
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["projects"],
-    queryFn: fetchProjects,
-  });
+  const { data, isLoading, isError, error } = useProjects();
+  const deleteMutation = useDeleteMutation();
+
+  const handleDelete = (id) => {
+    if (window.confirm("Delete?")) {
+      deleteMutation.mutate(id);
+    }
+  };
 
   if (isLoading)
     return <div style={{ padding: "40px" }}>Loading your portfolio...</div>;
@@ -40,25 +40,7 @@ const Home = () => {
       <hr style={{ margin: "20px 0" }} />
 
       <h2>My Work</h2>
-      <div style={{ display: "grid", gap: "20px" }}>
-        {/* Mapping over the real MongoDB documents */}
-        {data.data.map((project) => (
-          <div
-            key={project._id}
-            style={{
-              border: "1px solid #ccc",
-              padding: "15px",
-              borderRadius: "8px",
-            }}
-          >
-            <h3>{project.title}</h3>
-            <p>{project.description}</p>
-            <p style={{ fontSize: "0.9em", color: "#555" }}>
-              <strong>Tech Stack:</strong> {project.techStack.join(" • ")}
-            </p>
-          </div>
-        ))}
-      </div>
+      <ProjectList projects={data.data} onDelete={handleDelete} />
     </div>
   );
 };

@@ -24,6 +24,7 @@ services:
       - /app/node_modules
     environment:
       - VITE_API_URL=http://backend:8000/api/v1
+      - CHOKIDAR_USEPOLLING=true
     depends_on:
       - backend
 

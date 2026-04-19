@@ -1,43 +1,21 @@
 import React from "react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import axios from "axios";
-const API_URL = import.meta.env.VITE_API_URL;
+import { loginAPI } from "../api/projects";
+import { useProjectMutation } from "../hooks/useProjects";
+import { useLoginMutation } from "../hooks/useLogin";
+import { useAuth } from "../context/authContext";
 
-const loginAPI = async (credentials) => {
-  const response = await axios.post(`${API_URL}/auth/login`, credentials);
-  return response.data;
-};
+const Admin = () => {
+  const { token } = useAuth();
 
-const createProject = async (newProject) => {
-  const token = localStorage.getItem("token");
-
-  const config = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
-
-  const response = await axios.post(`${API_URL}/projects`, newProject, config);
-  return response.data;
-};
-
-const Admin = ({ setToken }) => {
-  const queryClient = useQueryClient();
-  const token = localStorage.getItem("token");
+  const loginMutation = useLoginMutation();
+  const projectMutation = useProjectMutation();
 
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     techStack: "",
-  });
-
-  const projectMutation = useMutation({
-    mutationFn: createProject,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
-      setFormData({ title: "", description: "", techStack: "" });
-    },
   });
 
   const handleSubmit = (e) => {
@@ -48,21 +26,14 @@ const Admin = ({ setToken }) => {
       techStack: formData.techStack.split(",").map((tech) => tech.trim()),
     };
 
-    projectMutation.mutate(projectPayload);
+    projectMutation.mutate(projectPayload, {
+      onSuccess: () => {
+        setFormData({ title: "", description: "", techStack: "" });
+      },
+    });
   };
 
   const [loginData, setLoginData] = useState({ email: "", password: "" });
-
-  const loginMutation = useMutation({
-    mutationFn: loginAPI,
-    onSuccess: (data) => {
-      setToken(data.token);
-      localStorage.setItem("token", data.token);
-    },
-    onError: (error) => {
-      console.log(error.response?.data?.error || "Login Failed");
-    },
-  });
 
   const handleLogin = (e) => {
     e.preventDefault();

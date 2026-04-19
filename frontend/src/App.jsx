@@ -5,14 +5,14 @@ import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import ProtectedRoute from "../components/ProtectedRoute";
 import Home from "../pages/Home.jsx";
 import Admin from "../pages/Admin.jsx";
+import { useAuth } from "../context/authContext.jsx";
 
 const App = () => {
   const navigate = useNavigate();
-  const [token, setToken] = useState(localStorage.getItem("token"));
+  const { token, logout } = useAuth();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    setToken(null);
+    logout();
     navigate("/");
   };
 
@@ -91,7 +91,7 @@ const App = () => {
 
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/admin" element={<Admin setToken={setToken} />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
     </div>
   );

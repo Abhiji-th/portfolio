@@ -1,5 +1,6 @@
 import { redisClient } from "../config/redis.js";
 import Project from "../models/Project.js";
+import User from "../models/User.js";
 
 const getProjects = async (req, res) => {
   try {
@@ -58,4 +59,38 @@ const createProject = async (req, res) => {
   }
 };
 
-export { getProjects, createProject };
+const updateProject = async (req, res) => {
+  try {
+    const project = await Project.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!project) res.status(404).json({ success: false, error: "Not found" });
+
+    await redisClient.del("portfolio_projects");
+
+    res.status(200).json({ success: true, data: project });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+const deleteProject = async (req, res) => {
+  try {
+    const project = await Project.findByIdAndDelete(req.params.id);
+
+    if (!project) res.status(404).json({ success: false, error: "Not found" });
+
+    await redisClient.del("portfolio_projects");
+
+    res.status(200).json({ success: true, data: {} });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+};
+
+export { getProjects, createProject, updateProject, deleteProject };
