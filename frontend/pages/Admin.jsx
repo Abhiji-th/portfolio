@@ -2,12 +2,15 @@ import React from "react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { loginAPI } from "../api/projects";
-import { useProjectMutation } from "../hooks/useProjects";
+import { useGetProjectById, useProjectMutation } from "../hooks/useProjects";
 import { useLoginMutation } from "../hooks/useLogin";
 import { useAuth } from "../context/authContext";
+import { useParams } from "react-router-dom";
+import { useEffect } from "react";
 
 const Admin = () => {
   const { token } = useAuth();
+  const { id } = useParams();
 
   const loginMutation = useLoginMutation();
   const projectMutation = useProjectMutation();
@@ -17,6 +20,18 @@ const Admin = () => {
     description: "",
     techStack: "",
   });
+
+  const { data, isLoading } = useGetProjectById(id);
+
+  useEffect(() => {
+    if (data) {
+      setFormData({
+        title: data.title || "",
+        description: data.description || "",
+        techStack: data.techStack || "",
+      });
+    }
+  }, [data]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

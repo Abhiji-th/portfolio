@@ -2,11 +2,22 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import ProjectList from "../components/ProjectList";
-import { useDeleteMutation, useProjects } from "../hooks/useProjects";
+import {
+  useDeleteMutation,
+  useProjects,
+  useUpdateMutation,
+} from "../hooks/useProjects";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const { data, isLoading, isError, error } = useProjects();
   const deleteMutation = useDeleteMutation();
+  const updateMutation = useUpdateMutation();
+  const navigate = useNavigate();
+
+  const handleUpdate = (id) => {
+    navigate(`/admin/${id}`);
+  };
 
   const handleDelete = (id) => {
     if (window.confirm("Delete?")) {
@@ -40,7 +51,11 @@ const Home = () => {
       <hr style={{ margin: "20px 0" }} />
 
       <h2>My Work</h2>
-      <ProjectList projects={data.data} onDelete={handleDelete} />
+      <ProjectList
+        projects={data.data}
+        onDelete={handleDelete}
+        onEdit={handleUpdate}
+      />
     </div>
   );
 };

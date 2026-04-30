@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getProjects,
+  getProjectById,
   createProject,
   updateProject,
   deleteProject,
@@ -11,6 +12,8 @@ const router = express.Router();
 
 router.route("/").get(getProjects).post(protect, createProject);
 
-router.route("/:id").put(protect, updateProject).delete(protect, deleteProject);
+router.route("/:id").get(getProjectById).delete(protect, deleteProject);
+
+router.route("/admin/:id").put(protect, updateProject);
 
 export default router;

@@ -1,7 +1,7 @@
 import React from "react";
 import { useAuth } from "../context/authContext";
 
-const ProjectList = ({ projects, onDelete }) => {
+const ProjectList = ({ projects, onDelete, onEdit }) => {
   const { token } = useAuth();
   return (
     <div style={{ display: "grid", gap: "20px" }}>
@@ -21,17 +21,30 @@ const ProjectList = ({ projects, onDelete }) => {
             <strong>Tech Stack:</strong> {project.techStack.join(" • ")}
           </p>
           {token && (
-            <button
-              onClick={() => onDelete(project._id)}
-              style={{
-                color: "red",
-                border: "none",
-                background: "none",
-                cursor: "pointer",
-              }}
-            >
-              Delete
-            </button>
+            <div>
+              <button
+                onClick={() => onDelete(project._id)}
+                style={{
+                  color: "red",
+                  border: "none",
+                  background: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Delete
+              </button>
+              <button
+                onClick={() => onEdit(project._id)}
+                style={{
+                  color: "blue",
+                  border: "none",
+                  background: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Edit
+              </button>
+            </div>
           )}
         </div>
       ))}

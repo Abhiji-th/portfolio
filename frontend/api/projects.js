@@ -17,13 +17,31 @@ export const loginAPI = async (credentials) => {
   return response.data;
 };
 
-export const fetchProjects = async () => {
-  const response = await axios.get(`${API_URL}/projects`);
-  return response.data;
+export const getProjects = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/projects`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getProjectById = async (id) => {
+  const response = await axios.get(`${API_URL}/projects/${id}`);
+  return response.data.data;
 };
 
 export const createProject = async (newProject) => {
   const response = await axios.post(
+    `${API_URL}/projects`,
+    newProject,
+    getAuthConfig(),
+  );
+  return response.data;
+};
+
+export const updateProject = async (newProject) => {
+  const response = await axios.put(
     `${API_URL}/projects`,
     newProject,
     getAuthConfig(),
