@@ -40,9 +40,9 @@ export const createProject = async (newProject) => {
   return response.data;
 };
 
-export const updateProject = async (newProject) => {
+export const updateProject = async ({ id, newProject }) => {
   const response = await axios.put(
-    `${API_URL}/projects`,
+    `${API_URL}/projects/${id}`,
     newProject,
     getAuthConfig(),
   );

@@ -12,8 +12,10 @@ const router = express.Router();
 
 router.route("/").get(getProjects).post(protect, createProject);
 
-router.route("/:id").get(getProjectById).delete(protect, deleteProject);
-
-router.route("/admin/:id").put(protect, updateProject);
+router
+  .route("/:id")
+  .get(getProjectById)
+  .delete(protect, deleteProject)
+  .put(protect, updateProject);
 
 export default router;

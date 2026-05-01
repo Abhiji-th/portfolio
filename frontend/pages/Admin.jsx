@@ -2,18 +2,25 @@ import React from "react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { loginAPI } from "../api/projects";
-import { useGetProjectById, useProjectMutation } from "../hooks/useProjects";
+import {
+  useGetProjectById,
+  useProjectMutation,
+  useUpdateMutation,
+} from "../hooks/useProjects";
 import { useLoginMutation } from "../hooks/useLogin";
 import { useAuth } from "../context/authContext";
 import { useParams } from "react-router-dom";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Admin = () => {
   const { token } = useAuth();
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const loginMutation = useLoginMutation();
-  const projectMutation = useProjectMutation();
+  const createMutation = useProjectMutation();
+  const updateMutation = useUpdateMutation();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -28,7 +35,7 @@ const Admin = () => {
       setFormData({
         title: data.title || "",
         description: data.description || "",
-        techStack: data.techStack || "",
+        techStack: data.techStack.join(",") || "",
       });
     }
   }, [data]);
@@ -41,11 +48,24 @@ const Admin = () => {
       techStack: formData.techStack.split(",").map((tech) => tech.trim()),
     };
 
-    projectMutation.mutate(projectPayload, {
-      onSuccess: () => {
-        setFormData({ title: "", description: "", techStack: "" });
-      },
-    });
+    if (id) {
+      updateMutation.mutate(
+        { id: id, newProject: projectPayload },
+        {
+          onSuccess: () => {
+            setFormData({ title: "", description: "", techStack: "" });
+          },
+        },
+      );
+    } else {
+      createMutation.mutate(projectPayload, {
+        onSuccess: () => {
+          setFormData({ title: "", description: "", techStack: "" });
+        },
+      });
+    }
+
+    navigate("/");
   };
 
   const [loginData, setLoginData] = useState({ email: "", password: "" });
@@ -111,7 +131,7 @@ const Admin = () => {
             marginBottom: "30px",
           }}
         >
-          <h2>➕ Add New Project</h2>
+          <h2>{id ? "Update Project" : "➕ Add New Project"}</h2>
           <form
             onSubmit={handleSubmit}
             style={{ display: "flex", flexDirection: "column", gap: "10px" }}
@@ -147,7 +167,7 @@ const Admin = () => {
             />
             <button
               type="submit"
-              disabled={projectMutation.isPending}
+              disabled={createMutation.isPending}
               style={{
                 padding: "10px",
                 background: "#007bff",
@@ -156,7 +176,7 @@ const Admin = () => {
                 cursor: "pointer",
               }}
             >
-              {projectMutation.isPending ? "Saving..." : "Save Project"}
+              {createMutation.isPending ? "Saving..." : "Save Project"}
             </button>
           </form>
         </div>
